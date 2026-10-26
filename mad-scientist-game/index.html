@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#06222e">
+<title>Mad Scientist: Lab Rampage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Passion+One:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-screen="loading">
+<canvas id="game" aria-label="Game view"></canvas>
+
+<div id="ui">
+  <!-- Loading -->
+  <section id="loading" class="screen show">
+    <div class="center">
+      <h1 class="logo small"><span>MAD</span><span>SCIENTIST</span></h1>
+      <div class="loadbar"><i></i></div>
+      <p class="muted-text" id="loadMsg">Mixing volatile chemicals…</p>
+    </div>
+  </section>
+
+  <!-- Title -->
+  <section id="title" class="screen">
+    <div class="title-wrap stagger">
+      <h1 class="logo" style="--i:0"><span>MAD</span><span>SCIENTIST</span></h1>
+      <p class="tagline" style="--i:1">LAB RAMPAGE</p>
+      <div class="menu" style="--i:2">
+        <button class="btn btn-big" data-action="play">PLAY</button>
+        <button class="btn btn-teal" data-action="armory">ARMORY</button>
+      </div>
+      <div class="title-stats" style="--i:3">
+        <span class="pill"><img src="../Mad%20scientist/PNG/User%20Interfaces/Potion.png" alt="Potions"><b id="tPotions">0</b></span>
+        <span class="pill">BEST <b id="tBest">0</b></span>
+        <span class="pill gun-pill"><img src="../Mad%20scientist/PNG/User%20Interfaces/DamageIcon.png" alt=""><b id="tGun">Plasma Claw</b></span>
+      </div>
+    </div>
+    <p class="controls-hint desktop-only">
+      <kbd>A</kbd><kbd>D</kbd> move · <kbd>Space</kbd> jump · <kbd>J</kbd> / click fire · <kbd>K</kbd> / right-click bomb · <kbd>Esc</kbd> pause
+    </p>
+  </section>
+
+  <!-- Armory -->
+  <section id="armory" class="screen">
+    <div class="armory-panel">
+      <header>
+        <button class="icon-btn back" data-action="back" aria-label="Back"><img src="../Mad%20scientist/PNG/User%20Interfaces/BackArrow.png" alt=""></button>
+        <h2>ARMORY</h2>
+        <span class="pill"><img src="../Mad%20scientist/PNG/User%20Interfaces/Potion.png" alt="Potions"><b id="aPotions">0</b></span>
+      </header>
+      <div class="armory-body">
+        <div class="weapon-grid" id="weaponGrid"></div>
+        <div class="weapon-detail" id="weaponDetail">
+          <h3 id="wName"></h3>
+          <p id="wBlurb"></p>
+          <div class="stat"><img src="../Mad%20scientist/PNG/User%20Interfaces/DamageIcon.png" alt=""><span>POWER</span><div class="bar" id="wPower"><i></i></div></div>
+          <div class="stat"><img src="../Mad%20scientist/PNG/User%20Interfaces/AttackSpeedICon.png" alt=""><span>RATE</span><div class="bar" id="wRate"><i></i></div></div>
+          <p class="special" id="wSpecial"></p>
+          <button class="btn btn-big" id="wAction" data-action="equip">EQUIP</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- In-game HUD -->
+  <section id="hud" class="screen">
+    <div class="profile">
+      <img src="../Mad%20scientist/PNG/User%20Interfaces/ProfileBar.png" alt="">
+      <div class="hp"><i id="hpGhost" class="ghost"></i><i id="hpFill" class="fill"></i></div>
+      <span id="hpText" class="hp-text">100 / 100</span>
+    </div>
+    <div class="topright">
+      <div class="scorebox"><span>SCORE</span><b id="score">0</b></div>
+      <div class="potionbar"><b id="potions">0</b></div>
+      <button class="icon-btn pause-btn" data-action="pause" aria-label="Pause"><span></span><span></span></button>
+    </div>
+    <div class="wave-label" id="waveLabel">SECTOR 1</div>
+    <div class="combo" id="combo"><b id="comboNum">0</b><span>COMBO</span><em id="comboMult"></em><i id="comboBar"></i></div>
+    <div class="rage" id="rageBar"><span>RAGE ×2</span><i></i></div>
+    <div class="go" id="go">GO <img src="../Mad%20scientist/PNG/User%20Interfaces/BackArrow.png" alt=""></div>
+    <div class="banner" id="banner"><h2></h2><p></p></div>
+    <div class="hint" id="hint">
+      <span class="desktop-only"><kbd>A</kbd><kbd>D</kbd> move &nbsp; <kbd>Space</kbd> jump &nbsp; hold <kbd>J</kbd> fire &nbsp; <kbd>K</kbd> bomb</span>
+      <span class="touch-only">Stick to move · Hold the crosshair to fire</span>
+    </div>
+    <div class="bomb-hud desktop-only"><img src="../Mad%20scientist/PNG/Projectile/Other/1.png" alt="Bombs"><span class="bomb-count">3</span><kbd>K</kbd></div>
+
+    <div class="touch-controls touch-only">
+      <div class="stick" id="stick"><i></i></div>
+      <button class="t-btn t-fire" data-touch="fire" aria-label="Fire"></button>
+      <button class="t-btn t-jump" data-touch="jump" aria-label="Jump"><svg viewBox="0 0 24 24"><path d="M12 5l7 8h-4v6H9v-6H5z"/></svg></button>
+      <button class="t-btn t-bomb" data-touch="bomb" aria-label="Bomb"><img src="../Mad%20scientist/PNG/Projectile/Other/1.png" alt=""><span class="bomb-count">3</span></button>
+    </div>
+  </section>
+
+  <!-- Pause -->
+  <section id="pause" class="screen modal">
+    <div class="panel panel-small pop">
+      <button class="icon-btn snd" data-action="sound" aria-label="Toggle sound">
+    <svg class="on" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+    <svg class="off" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9l6 6M22 9l-6 6" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <h2>PAUSED</h2>
+      <button class="btn btn-big" data-action="resume">RESUME</button>
+      <button class="btn btn-teal" data-action="restart">RESTART</button>
+      <button class="btn btn-brown" data-action="menu">QUIT</button>
+    </div>
+  </section>
+
+  <!-- Game over -->
+  <section id="gameover" class="screen modal">
+    <div class="panel pop">
+      <img class="badge" src="../Mad%20scientist/PNG/User%20Interfaces/AchievmentBadges.png" alt="New best">
+      <h2>EXPERIMENT<br>FAILED</h2>
+      <div class="big-score"><span>SCORE</span><b id="goScore">0</b><em>NEW BEST!</em></div>
+      <dl class="stats">
+        <div><dt>Best</dt><dd id="goBest">0</dd></div>
+        <div><dt>Reached</dt><dd id="goWave">1-1</dd></div>
+        <div><dt>Guards</dt><dd id="goKills">0</dd></div>
+        <div><dt>Top combo</dt><dd id="goCombo">0</dd></div>
+        <div><dt>Potions</dt><dd id="goPotions">+0</dd></div>
+      </dl>
+      <div class="row">
+        <button class="btn btn-big" data-action="restart">RETRY</button>
+      </div>
+      <div class="row">
+        <button class="btn btn-teal" data-action="armory">ARMORY</button>
+        <button class="btn btn-brown" data-action="menu">MENU</button>
+      </div>
+    </div>
+  </section>
+
+  <button class="icon-btn sound-btn snd" data-action="sound" aria-label="Toggle sound">
+    <svg class="on" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+    <svg class="off" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9l6 6M22 9l-6 6" fill="none" stroke-width="2" stroke-linecap="round"/></svg>
+  </button>
+  <div id="fade"></div>
+  <div id="rotate" class="touch-only">Rotate your device for the best experience</div>
+  <div id="fatal" hidden></div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
