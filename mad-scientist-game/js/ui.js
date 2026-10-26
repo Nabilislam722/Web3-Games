@@ -1,9 +1,10 @@
 // DOM overlay: menus, armory, HUD, modals and touch controls. All motion is
 // CSS transitions/animations so it stays smooth while the canvas renders.
 
-import { WEAPONS, WEAPON_BY_KEY } from './data.js';
+import { WEAPONS, WEAPON_BY_KEY, ZONES, raidSetup } from './data.js';
 import { ROOT, uiPath } from './assets.js';
 import { saveProfile } from './util.js';
+import { shortAddress } from './hemi.js';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const gunImage = (key) => encodeURI(`${ROOT}Spine/Main Characters/${key}/Images/Hand_W_Gun.png`);
@@ -26,10 +27,13 @@ function bump(el) {
 }
 
 export class UI {
-  constructor({ profile, sfx, input }) {
+  constructor({ profile, sfx, input, hemi }) {
     this.profile = profile;
     this.sfx = sfx;
     this.input = input;
+    this.hemi = hemi;
+    this.raid = null;
+    hemi.onChange(() => this.updateWallet());
     this.game = null;
     this.current = 'loading';
     this.selected = profile.equipped;
@@ -59,7 +63,10 @@ export class UI {
     for (const s of document.querySelectorAll('.screen')) s.classList.toggle('show', s.id === id || (id === 'pause' && s.id === 'hud') || (id === 'gameover' && s.id === 'hud'));
     this.current = id;
     document.body.dataset.screen = id;
-    if (id === 'title') this.refreshTitle();
+    if (id === 'title') {
+      this.refreshTitle();
+      this.refreshTeaser();
+    }
   }
 
   setLoading(frac) {
@@ -99,7 +106,31 @@ export class UI {
       case 'restart':
         this.sfx.play('ui');
         this.show('hud');
-        g.startRun();
+        g.startRun(g.raid);
+        break;
+      case 'raid':
+        this.sfx.play('ui');
+        if (g.mode !== 'menu') g.enterMenu();
+        this.openRaid();
+        break;
+      case 'raidBack':
+        this.sfx.play('uiBack');
+        this.show('title');
+        break;
+      case 'raidRetry':
+        this.openRaid(true);
+        break;
+      case 'playRaid':
+        if (!this.raid) return;
+        this.sfx.play('ui');
+        this.show('hud');
+        g.startRun(this.raid);
+        break;
+      case 'wallet':
+        this.connectWallet();
+        break;
+      case 'submitScore':
+        this.submitRun();
         break;
       case 'menu':
         this.sfx.play('uiBack');
@@ -131,6 +162,7 @@ export class UI {
       e.preventDefault();
       this.action('play');
     } else if (this.current === 'armory' && e.code === 'Escape') this.action('back');
+    else if (this.current === 'raid' && e.code === 'Escape') this.action('raidBack');
     else if ((this.current === 'hud' || this.current === 'pause') && (e.code === 'Escape' || e.code === 'KeyP')) this.togglePause();
     else if (this.current === 'gameover' && e.code === 'Enter') this.action('restart');
     else if (e.code === 'KeyM') this.action('sound');
@@ -304,7 +336,9 @@ export class UI {
   bombDenied() { for (const el of document.querySelectorAll('.bomb-hud, .t-bomb')) bump(el); }
 
   updateWave(sector, wave) {
-    $('#waveLabel').innerHTML = `SECTOR ${sector}${wave ? ` <i></i> WAVE ${wave}/5` : ''}`;
+    const raid = this.game?.raid;
+    const prefix = raid ? `RAID #${raid.raidId.toLocaleString()} <i></i> ` : '';
+    $('#waveLabel').innerHTML = `${prefix}SECTOR ${sector}${wave ? ` <i></i> WAVE ${wave}/5` : ''}`;
   }
 
   updateCombo(n, mult, frac) {
@@ -352,6 +386,164 @@ export class UI {
     $('#goPotions').textContent = '+' + s.potions;
     $('#goCombo').textContent = s.combo;
     $('#gameover').classList.toggle('new-best', s.newBest);
+    this.lastRun = s;
+    $('#gameover').classList.toggle('raid-run', !!s.raid);
+    if (s.raid) {
+      $('#goRaid').textContent = '#' + s.raid.raidId.toLocaleString();
+      const btn = $('#submitBtn');
+      btn.textContent = 'SUBMIT TO HEMI';
+      btn.disabled = !this.hemi.hasArena || s.score <= 0;
+      this.setStatus('#submitStatus', !this.hemi.hasArena
+        ? `The leaderboard isn't deployed on ${this.hemi.net.name} yet.`
+        : s.score <= 0 ? 'Score some points to post this run.' : `Post this run to the raid leaderboard on ${this.hemi.net.name}.`);
+    }
+  }
+
+  // -------------------------------------------------------- block raid --
+
+  /** Show text (and optionally a link or retry button) in a status line. */
+  setStatus(sel, text, kind = '', extra = null) {
+    const el = $(sel);
+    el.className = 'status ' + kind;
+    el.textContent = text;
+    if (extra?.href) {
+      const a = document.createElement('a');
+      a.href = extra.href;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.textContent = extra.label;
+      el.append(' ', a);
+    }
+    if (extra?.action) {
+      const b = document.createElement('button');
+      b.dataset.action = extra.action;
+      b.textContent = extra.label;
+      el.append(b);
+    }
+  }
+
+  async refreshTeaser() {
+    const el = $('#raidTeaser');
+    try {
+      const r = await this.hemi.loadRaid();
+      const left = r.startHeight + r.raidLength - r.tipHeight;
+      el.innerHTML = `<b>Raid #${r.raidId.toLocaleString()}</b> is live · ${left.toLocaleString()} Bitcoin blocks left`;
+    } catch {
+      el.textContent = '';
+    }
+  }
+
+  async openRaid(force = false) {
+    this.show('raid');
+    this.updateWallet();
+    $('#playRaid').disabled = !this.raid;
+    this.setStatus('#raidStatus', 'Reading the latest Bitcoin block through Hemi…');
+    try {
+      const raid = await this.hemi.loadRaid(force);
+      this.raid = raid;
+      this.renderRaid(raid);
+      $('#playRaid').disabled = false;
+      this.setStatus('#raidStatus', '');
+      await this.loadBoard();
+    } catch (e) {
+      this.setStatus('#raidStatus', e.message || "Couldn't load the raid.", 'error', { action: 'raidRetry', label: 'Try again' });
+    }
+  }
+
+  renderRaid(r) {
+    const { modifier, zone } = raidSetup(r.seed);
+    $('#raidNet').textContent = this.hemi.net.name;
+    $('#raidId').textContent = '#' + r.raidId.toLocaleString();
+    $('#raidStart').textContent = r.startHeight.toLocaleString();
+    const hex = r.seed.slice(2);
+    const zeros = hex.match(/^0*/)[0];
+    $('#raidHash').innerHTML = `<span class="z">0x${zeros}</span>${hex.slice(zeros.length)}`;
+    const done = Math.min(r.raidLength, r.tipHeight - r.startHeight + 1);
+    $('#raidBar').style.transform = `scaleX(${done / r.raidLength})`;
+    const left = r.raidLength - done + 1;
+    const mins = left * 10;
+    const eta = mins >= 90 ? `about ${Math.round(mins / 60)} h` : `about ${mins} min`;
+    $('#raidNext').textContent = `Next raid in ${left.toLocaleString()} Bitcoin block${left === 1 ? '' : 's'} (${eta})`;
+    $('#raidMod').textContent = modifier.name;
+    $('#raidModText').textContent = `${modifier.blurb} Starts in the ${ZONES[zone].name}.`;
+  }
+
+  async loadBoard() {
+    const list = $('#raidBoard');
+    const note = $('#boardNote');
+    if (!this.raid) return;
+    if (!this.hemi.hasArena) {
+      list.innerHTML = '';
+      note.textContent = `The leaderboard contract isn't deployed on ${this.hemi.net.name} yet, so raid scores stay on this device. Raids still use the live Bitcoin seed.`;
+      return;
+    }
+    try {
+      const board = await this.hemi.leaderboard(this.raid.raidId);
+      this.renderBoard(board);
+    } catch (e) {
+      note.textContent = e.message;
+    }
+  }
+
+  renderBoard(board) {
+    const list = $('#raidBoard');
+    const me = this.hemi.account?.toLowerCase();
+    list.innerHTML = '';
+    board.forEach((e, i) => {
+      const li = document.createElement('li');
+      if (e.player.toLowerCase() === me) li.className = 'me';
+      const url = this.hemi.addressUrl(e.player);
+      const who = document.createElement(url ? 'a' : 'span');
+      who.className = 'who';
+      who.textContent = e.player.toLowerCase() === me ? 'You' : shortAddress(e.player);
+      if (url) Object.assign(who, { href: url, target: '_blank', rel: 'noopener', title: e.player });
+      li.innerHTML = `<span class="rank">${i + 1}</span>`;
+      li.append(who);
+      li.insertAdjacentHTML('beforeend', `<span class="gun">${WEAPONS[e.weapon - 1]?.name ?? ''}</span><b>${e.score.toLocaleString()}</b>`);
+      list.append(li);
+    });
+    $('#boardNote').textContent = board.length ? '' : 'No scores yet. Play the raid and be first on the board.';
+  }
+
+  updateWallet() {
+    const btn = $('#walletBtn');
+    const a = this.hemi.account;
+    btn.textContent = a ? shortAddress(a) : 'Connect wallet';
+    btn.classList.toggle('connected', !!a);
+    btn.title = a ? `Connected to ${this.hemi.net.name}` : `Connect a wallet on ${this.hemi.net.name}`;
+    if (this.current === 'raid' && this.raid && this.hemi.hasArena) this.loadBoard();
+  }
+
+  async connectWallet() {
+    this.sfx.play('ui');
+    try {
+      await this.hemi.connect();
+      this.setStatus('#raidStatus', `Connected to ${this.hemi.net.name}.`, 'ok');
+    } catch (e) {
+      this.setStatus('#raidStatus', e.message, 'error');
+    }
+  }
+
+  async submitRun() {
+    const s = this.lastRun;
+    if (!s?.raid) return;
+    const btn = $('#submitBtn');
+    btn.disabled = true;
+    this.sfx.play('ui');
+    this.setStatus('#submitStatus', 'Connecting to your wallet…');
+    try {
+      const res = await this.hemi.submitScore(
+        { raidId: s.raid.raidId, score: s.score, kills: s.kills, wave: Math.min(65535, s.globalWave), weapon: s.weapon },
+        (stage) => this.setStatus('#submitStatus', stage === 'wallet' ? 'Confirm the transaction in your wallet…' : `Recording on ${this.hemi.net.name}…`),
+      );
+      btn.textContent = 'SUBMITTED';
+      this.sfx.play('unlock');
+      this.setStatus('#submitStatus', `Recorded on ${this.hemi.net.name}.`, 'ok', res.url ? { href: res.url, label: 'View transaction' } : null);
+    } catch (e) {
+      btn.disabled = e.code === 'notImproved' || e.code === 'raidClosed';
+      this.setStatus('#submitStatus', e.message, 'error', e.hash && this.hemi.txUrl(e.hash) ? { href: this.hemi.txUrl(e.hash), label: 'View transaction' } : null);
+      if (e.code !== 'rejected') this.sfx.play('deny');
+    }
   }
 
   // ------------------------------------------------------------- touch --

@@ -5,9 +5,9 @@ import { rgba } from './gl.js';
 import { Hero, Enemy } from './actors.js';
 import { Particles, Popups, GlyphFont, SpineFx, makeTextures } from './fx.js';
 import {
-  GROUND_Y, VIEW_H, WEAPON_BY_KEY, ENEMIES, ENEMY_UNLOCK, WAVES_PER_SECTOR, ZONES,
+  GROUND_Y, VIEW_H, WEAPONS, WEAPON_BY_KEY, ENEMIES, ENEMY_UNLOCK, WAVES_PER_SECTOR, ZONES, raidSetup,
 } from './data.js';
-import { clamp, rand, randInt, pick, chance, damp, lerp, ease, wobble, segmentHitsBox } from './util.js';
+import { clamp, rand, randInt, chance, damp, lerp, ease, wobble, segmentHitsBox, seededRng } from './util.js';
 
 const PANEL_W = 3257 * (VIEW_H / 799);
 
@@ -48,6 +48,8 @@ export class Game {
     this.zoneIndex = 0;
     this.paused = false;
     this.mode = 'menu';
+    this.raid = null;
+    this.rng = Math.random;
     this.hero = new Hero(this, this.skel[profile.equipped], WEAPON_BY_KEY[profile.equipped]);
     this.enterMenu();
   }
@@ -110,11 +112,17 @@ export class Game {
     this.particles.ring(h.x, h.y - 90, 260, WEAPON_BY_KEY[key].color, 0.45, 0);
   }
 
-  startRun() {
+  /** Start a run. A Block Raid passes its Bitcoin-seeded `raid` info. */
+  startRun(raid = null) {
     this.mode = 'play';
     this.paused = false;
     this.clearWorld();
-    this.zoneIndex = 0;
+    this.raid = raid;
+    this.rng = raid ? seededRng(raid.seed) : Math.random;
+    const setup = raid ? raidSetup(raid.seed) : null;
+    this.mod = setup?.modifier || null;
+    this.zoneStart = setup?.zone || 0;
+    this.zoneIndex = this.zoneStart;
     this.sector = 0;
     this.wave = 0;
     this.score = 0;
@@ -130,7 +138,8 @@ export class Game {
     this.triggerX = this.hero.x + 320;
     this.input.reset();
     this.ui.onRunStart();
-    this.ui.banner(`SECTOR 1`, ZONES[0].name);
+    if (raid) this.ui.banner(`BLOCK RAID #${raid.raidId.toLocaleString()}`, `${this.mod.name} · ${ZONES[this.zoneIndex].name}`);
+    else this.ui.banner('SECTOR 1', ZONES[0].name);
     this.audio.play('wave');
   }
 
@@ -304,6 +313,11 @@ export class Game {
 
   get globalWave() { return this.sector * WAVES_PER_SECTOR + this.wave - 1; }
 
+  // Wave composition draws from `rng`. A Block Raid seeds it with its Bitcoin
+  // block hash, so every player meets the same guards in the same order.
+  rr(a, b) { return a + this.rng() * (b - a); }
+  rpick(arr) { return arr[Math.floor(this.rng() * arr.length)]; }
+
   startWave() {
     this.wave++;
     const g = this.globalWave;
@@ -311,9 +325,13 @@ export class Game {
     this.budget = 4.5 + g * 1.7 + this.sector * 2;
     this.maxAlive = Math.min(9, 3 + Math.floor(g * 0.6));
     this.spawnT = 0.9;
-    this.pool = Object.keys(ENEMY_UNLOCK).filter((k) => ENEMY_UNLOCK[k] <= g);
+    const mod = this.mod;
+    let pool = Object.keys(ENEMY_UNLOCK).filter((k) => ENEMY_UNLOCK[k] <= g);
+    if (mod?.early) pool = [...new Set([...pool, ...mod.early])];
+    if (mod?.boost) pool = pool.concat(pool.filter((k) => ENEMIES[k].kind === mod.boost));
+    this.pool = pool;
     this.newest = Object.keys(ENEMY_UNLOCK).filter((k) => ENEMY_UNLOCK[k] === g);
-    this.eliteLeft = this.wave === WAVES_PER_SECTOR ? 1 + this.sector : g >= 6 && chance(0.4) ? 1 : 0;
+    this.eliteLeft = this.wave === WAVES_PER_SECTOR ? 1 + this.sector : mod?.eliteEvery || (g >= 6 && this.rng() < 0.4) ? 1 : 0;
     this.setPhase('fight');
     this.ui.showGo(false);
     this.ui.banner(`WAVE ${this.wave}`, this.wave === WAVES_PER_SECTOR ? 'Elite guards incoming!' : `Sector ${this.sector + 1} · ${ZONES[this.zoneIndex].name}`);
@@ -323,24 +341,25 @@ export class Game {
 
   spawnGroup() {
     const g = this.globalWave;
-    const n = randInt(1, Math.min(3, 1 + Math.floor(g / 3)));
+    const n = 1 + Math.floor(this.rng() * Math.min(3, 1 + Math.floor(g / 3)));
+    const droneCap = this.mod?.droneCap ?? 2;
     for (let i = 0; i < n && this.budget > 0; i++) {
-      let key = this.newest.length && chance(0.45) ? pick(this.newest) : pick(this.pool);
+      let key = this.newest.length && this.rng() < 0.45 ? this.rpick(this.newest) : this.rpick(this.pool);
       // Keep drones from dominating a wave.
-      if (ENEMIES[key].kind === 'drone' && this.enemies.filter((e) => e.kind === 'drone' && !e.dead).length >= 2) key = 'Enemy01';
+      if (ENEMIES[key].kind === 'drone' && this.enemies.filter((e) => e.kind === 'drone' && !e.dead).length >= droneCap) key = 'Enemy01';
       const elite = this.eliteLeft > 0 && this.budget < 6 && ENEMIES[key].kind !== 'drone';
       if (elite) this.eliteLeft--;
       this.budget -= ENEMIES[key].cost * (elite ? 2 : 1);
       this.spawnEnemy(key, elite, i);
     }
-    this.spawnT = rand(1.3, 2.6) * Math.max(0.5, 1 - g * 0.035);
+    this.spawnT = this.rr(1.3, 2.6) * Math.max(0.5, 1 - g * 0.035) * (this.mod?.spawnRate ?? 1);
   }
 
   spawnEnemy(key, elite = false, i = 0) {
     const def = ENEMIES[key];
     const g = this.globalWave;
-    const fromLeft = g >= 2 && chance(0.28);
-    const x = fromLeft ? this.cam.x - rand(80, 160) - i * 70 : this.cam.x + this.viewW + rand(80, 160) + i * 70;
+    const fromLeft = g >= 2 && this.rng() < 0.28;
+    const x = fromLeft ? this.cam.x - this.rr(80, 160) - i * 70 : this.cam.x + this.viewW + this.rr(80, 160) + i * 70;
     const y = def.kind === 'drone' ? GROUND_Y - def.hover - 160 : GROUND_Y;
     const e = new Enemy(this, key, this.skel[key], def, {
       x, y, elite,
@@ -373,7 +392,7 @@ export class Game {
   nextSector() {
     this.sector++;
     this.wave = 0;
-    this.zoneIndex = this.sector % ZONES.length;
+    this.zoneIndex = (this.zoneStart + this.sector) % ZONES.length;
     const hero = this.hero;
     this.clearWorld();
     hero.x = 260;
@@ -818,6 +837,8 @@ export class Game {
     this.ui.showGameOver({
       score: this.score, best: p.best, newBest, kills: this.kills,
       sector: this.sector + 1, wave: Math.max(1, this.wave), potions: this.potionsEarned, combo: this.bestCombo,
+      raid: this.raid, globalWave: Math.max(1, this.globalWave + 1),
+      weapon: WEAPONS.findIndex((w) => w.key === this.hero.weapon.key) + 1,
     });
   }
 

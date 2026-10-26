@@ -30,7 +30,9 @@
       <p class="tagline" style="--i:1">LAB RAMPAGE</p>
       <div class="menu" style="--i:2">
         <button class="btn btn-big" data-action="play">PLAY</button>
+        <button class="btn btn-big btn-raid" data-action="raid">BLOCK RAID</button>
         <button class="btn btn-teal" data-action="armory">ARMORY</button>
+        <p class="raid-teaser" id="raidTeaser" aria-live="polite"></p>
       </div>
       <div class="title-stats" style="--i:3">
         <span class="pill"><img src="../Mad%20scientist/PNG/User%20Interfaces/Potion.png" alt="Potions"><b id="tPotions">0</b></span>
@@ -62,6 +64,35 @@
           <button class="btn btn-big" id="wAction" data-action="equip">EQUIP</button>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- Bitcoin Block Raid -->
+  <section id="raid" class="screen">
+    <div class="armory-panel raid-panel">
+      <header>
+        <button class="icon-btn back" data-action="raidBack" aria-label="Back"><img src="../Mad%20scientist/PNG/User%20Interfaces/BackArrow.png" alt=""></button>
+        <h2>BLOCK RAID</h2>
+        <button class="pill wallet" data-action="wallet" id="walletBtn">Connect wallet</button>
+      </header>
+      <div class="raid-body">
+        <div class="raid-info">
+          <p class="eyebrow"><span id="raidNet">Hemi</span> · Bitcoin read through hVM</p>
+          <h3>RAID <b id="raidId">…</b></h3>
+          <p class="raid-line">Seeded by Bitcoin block <b id="raidStart">…</b></p>
+          <code class="btc-hash" id="raidHash">…</code>
+          <div class="raid-progress" aria-hidden="true"><i id="raidBar"></i></div>
+          <p class="raid-line" id="raidNext"></p>
+          <p class="raid-mod"><b id="raidMod"></b> <span id="raidModText"></span></p>
+          <button class="btn btn-big btn-raid" data-action="playRaid" id="playRaid" disabled>PLAY RAID</button>
+        </div>
+        <div class="raid-board">
+          <h4>Raid leaderboard</h4>
+          <ol id="raidBoard"></ol>
+          <p class="board-note" id="boardNote"></p>
+        </div>
+      </div>
+      <p class="status" id="raidStatus" role="status"></p>
     </div>
   </section>
 
@@ -114,7 +145,7 @@
   <section id="gameover" class="screen modal">
     <div class="panel pop">
       <img class="badge" src="../Mad%20scientist/PNG/User%20Interfaces/AchievmentBadges.png" alt="New best">
-      <h2>EXPERIMENT<br>FAILED</h2>
+      <h2>EXPERIMENT <br>FAILED</h2>
       <div class="big-score"><span>SCORE</span><b id="goScore">0</b><em>NEW BEST!</em></div>
       <dl class="stats">
         <div><dt>Best</dt><dd id="goBest">0</dd></div>
@@ -123,10 +154,13 @@
         <div><dt>Top combo</dt><dd id="goCombo">0</dd></div>
         <div><dt>Potions</dt><dd id="goPotions">+0</dd></div>
       </dl>
-      <div class="row">
-        <button class="btn btn-big" data-action="restart">RETRY</button>
+      <div class="raid-submit">
+        <p class="raid-tag">BLOCK RAID <b id="goRaid"></b></p>
+        <button class="btn btn-raid btn-submit" data-action="submitScore" id="submitBtn">SUBMIT TO HEMI</button>
+        <p class="status" id="submitStatus" role="status"></p>
       </div>
-      <div class="row">
+      <div class="actions">
+        <button class="btn btn-big" data-action="restart">RETRY</button>
         <button class="btn btn-teal" data-action="armory">ARMORY</button>
         <button class="btn btn-brown" data-action="menu">MENU</button>
       </div>

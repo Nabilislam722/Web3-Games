@@ -1,0 +1,6 @@
+{
+  "name": "mad-scientist-lab-rampage",
+  "private": true,
+  "type": "module",
+  "description": "Static browser game. Serve the repository root over HTTP; there is no build step. Contracts and their tooling live in contracts/."
+}

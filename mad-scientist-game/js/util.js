@@ -63,6 +63,29 @@ export function segmentHitsBox(x0, y0, x1, y1, r, bx, by, bw, bh) {
   return clip(-dx, x0 - minX) && clip(dx, maxX - x0) && clip(-dy, y0 - minY) && clip(dy, maxY - y0);
 }
 
+/**
+ * Deterministic PRNG (sfc32) seeded from a hex string such as a Bitcoin
+ * block hash. Uses the low 16 bytes, which carry the hash's entropy.
+ */
+export function seededRng(hex) {
+  const h = hex.replace(/^0x/, '').padStart(64, '0').slice(-32);
+  let a = parseInt(h.slice(0, 8), 16), b = parseInt(h.slice(8, 16), 16);
+  let c = parseInt(h.slice(16, 24), 16), d = parseInt(h.slice(24, 32), 16);
+  const next = () => {
+    a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0;
+    let t = (a + b) | 0;
+    a = b ^ (b >>> 9);
+    b = (c + (c << 3)) | 0;
+    c = (c << 21) | (c >>> 11);
+    d = (d + 1) | 0;
+    t = (t + d) | 0;
+    c = (c + t) | 0;
+    return (t >>> 0) / 4294967296;
+  };
+  for (let i = 0; i < 15; i++) next();
+  return next;
+}
+
 export function loadProfile() {
   const fallback = { potions: 0, best: 0, unlocked: ['Gun01'], equipped: 'Gun01', muted: false, tutorial: true };
   try {

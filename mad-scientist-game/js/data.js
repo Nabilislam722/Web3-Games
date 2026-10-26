@@ -113,3 +113,18 @@ export const ZONES = [
     motes: [0.4, 1, 0.9],
   },
 ];
+
+// Bitcoin Block Raids: each raid's seed (a Bitcoin block hash) picks one.
+export const RAID_MODIFIERS = [
+  { name: 'Drone Swarm', blurb: 'Drones arrive from wave 1, up to three at a time.', early: ['Enemy09'], boost: 'drone', droneCap: 3 },
+  { name: 'Gunline', blurb: 'Twice as many gunners hold the line.', boost: 'gunner' },
+  { name: 'Rush Hour', blurb: 'Guards pour in 35% faster.', spawnRate: 0.65 },
+  { name: 'Elite Escort', blurb: 'Every wave brings an elite guard.', eliteEvery: true },
+  { name: 'Brawl', blurb: 'Twice as many baton guards.', boost: 'melee' },
+];
+
+/** Everything a raid's Bitcoin block hash decides, besides the spawn RNG. */
+export function raidSetup(seed) {
+  const last = parseInt(seed.slice(-2), 16), prev = parseInt(seed.slice(-4, -2), 16);
+  return { modifier: RAID_MODIFIERS[last % RAID_MODIFIERS.length], zone: prev % ZONES.length };
+}
