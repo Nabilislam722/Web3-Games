@@ -1,0 +1,202 @@
+
+skeleton.png
+size: 1173,682
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Box
+  rotate: false
+  xy: 2, 30
+  size: 650, 650
+  orig: 650, 650
+  offset: 0, 0
+  index: -1
+D1
+  rotate: true
+  xy: 817, 167
+  size: 36, 37
+  orig: 36, 37
+  offset: 0, 0
+  index: -1
+D2
+  rotate: false
+  xy: 66, 9
+  size: 16, 19
+  orig: 16, 19
+  offset: 0, 0
+  index: -1
+D3
+  rotate: true
+  xy: 817, 130
+  size: 35, 36
+  orig: 35, 36
+  offset: 0, 0
+  index: -1
+D4
+  rotate: true
+  xy: 35, 3
+  size: 25, 29
+  orig: 25, 29
+  offset: 0, 0
+  index: -1
+Electric-shoot
+  rotate: false
+  xy: 874, 294
+  size: 140, 207
+  orig: 141, 207
+  offset: 0, 0
+  index: -1
+Electric-shoot02
+  rotate: false
+  xy: 1016, 232
+  size: 140, 207
+  orig: 141, 207
+  offset: 0, 0
+  index: -1
+Head
+  rotate: false
+  xy: 1073, 554
+  size: 96, 126
+  orig: 96, 126
+  offset: 0, 0
+  index: -1
+Ice
+  rotate: false
+  xy: 1008, 86
+  size: 163, 144
+  orig: 163, 144
+  offset: 0, 0
+  index: -1
+Weapon
+  rotate: false
+  xy: 1001, 7
+  size: 98, 77
+  orig: 98, 77
+  offset: 0, 0
+  index: -1
+skeleton-Fx3_0
+  rotate: false
+  xy: 2, 2
+  size: 31, 26
+  orig: 232, 205
+  offset: 96, 90
+  index: -1
+skeleton-Fx3_1
+  rotate: true
+  xy: 817, 91
+  size: 37, 32
+  orig: 232, 205
+  offset: 93, 87
+  index: -1
+skeleton-Fx3_10
+  rotate: false
+  xy: 1073, 466
+  size: 94, 86
+  orig: 232, 205
+  offset: 63, 60
+  index: -1
+skeleton-Fx3_11
+  rotate: true
+  xy: 654, 4
+  size: 110, 105
+  orig: 232, 205
+  offset: 56, 51
+  index: -1
+skeleton-Fx3_12
+  rotate: false
+  xy: 873, 166
+  size: 133, 126
+  orig: 232, 205
+  offset: 46, 40
+  index: -1
+skeleton-Fx3_13
+  rotate: true
+  xy: 855, 8
+  size: 156, 144
+  orig: 232, 205
+  offset: 35, 31
+  index: -1
+skeleton-Fx3_14
+  rotate: true
+  xy: 654, 116
+  size: 176, 161
+  orig: 232, 205
+  offset: 26, 22
+  index: -1
+skeleton-Fx3_15
+  rotate: false
+  xy: 874, 503
+  size: 197, 177
+  orig: 232, 205
+  offset: 16, 14
+  index: -1
+skeleton-Fx3_16
+  rotate: false
+  xy: 654, 487
+  size: 218, 193
+  orig: 232, 205
+  offset: 6, 6
+  index: -1
+skeleton-Fx3_17
+  rotate: true
+  xy: 654, 313
+  size: 172, 149
+  orig: 232, 205
+  offset: 25, 25
+  index: -1
+skeleton-Fx3_2
+  rotate: false
+  xy: 805, 296
+  size: 43, 37
+  orig: 232, 205
+  offset: 90, 85
+  index: -1
+skeleton-Fx3_3
+  rotate: false
+  xy: 817, 205
+  size: 48, 41
+  orig: 232, 205
+  offset: 88, 83
+  index: -1
+skeleton-Fx3_4
+  rotate: false
+  xy: 817, 248
+  size: 54, 46
+  orig: 232, 205
+  offset: 85, 81
+  index: -1
+skeleton-Fx3_5
+  rotate: true
+  xy: 1016, 441
+  size: 60, 51
+  orig: 232, 205
+  offset: 82, 78
+  index: -1
+skeleton-Fx3_6
+  rotate: false
+  xy: 1101, 28
+  size: 66, 56
+  orig: 232, 205
+  offset: 79, 76
+  index: -1
+skeleton-Fx3_7
+  rotate: true
+  xy: 805, 335
+  size: 71, 61
+  orig: 232, 205
+  offset: 77, 74
+  index: -1
+skeleton-Fx3_8
+  rotate: true
+  xy: 805, 408
+  size: 77, 65
+  orig: 232, 205
+  offset: 74, 72
+  index: -1
+skeleton-Fx3_9
+  rotate: true
+  xy: 761, 6
+  size: 83, 80
+  orig: 232, 205
+  offset: 69, 62
+  index: -1

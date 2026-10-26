@@ -1,0 +1,139 @@
+
+skeleton.png
+size: 1085,656
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+BlueFx
+  rotate: true
+  xy: 851, 354
+  size: 103, 142
+  orig: 106, 142
+  offset: 3, 0
+  index: -1
+Body
+  rotate: false
+  xy: 851, 459
+  size: 163, 195
+  orig: 163, 195
+  offset: 0, 0
+  index: -1
+Box
+  rotate: false
+  xy: 2, 4
+  size: 650, 650
+  orig: 650, 650
+  offset: 0, 0
+  index: -1
+Gun
+  rotate: false
+  xy: 654, 106
+  size: 192, 89
+  orig: 227, 111
+  offset: 0, 14
+  index: -1
+Hand_B
+  rotate: false
+  xy: 1022, 99
+  size: 55, 93
+  orig: 55, 93
+  offset: 0, 0
+  index: -1
+Hand_B2
+  rotate: false
+  xy: 995, 344
+  size: 74, 113
+  orig: 74, 114
+  offset: 0, 1
+  index: -1
+Hand_F
+  rotate: true
+  xy: 1016, 507
+  size: 147, 57
+  orig: 147, 58
+  offset: 0, 1
+  index: -1
+Hand_W_Gun
+  rotate: false
+  xy: 654, 197
+  size: 277, 125
+  orig: 312, 139
+  offset: 0, 14
+  index: -1
+Head01
+  rotate: true
+  xy: 754, 6
+  size: 98, 90
+  orig: 98, 90
+  offset: 0, 0
+  index: -1
+Head02
+  rotate: true
+  xy: 848, 91
+  size: 104, 80
+  orig: 104, 80
+  offset: 0, 0
+  index: -1
+Head03
+  rotate: true
+  xy: 930, 94
+  size: 98, 90
+  orig: 98, 90
+  offset: 0, 0
+  index: -1
+Head04
+  rotate: false
+  xy: 930, 2
+  size: 98, 90
+  orig: 98, 90
+  offset: 0, 0
+  index: -1
+Head05
+  rotate: false
+  xy: 654, 10
+  size: 98, 94
+  orig: 98, 94
+  offset: 0, 0
+  index: -1
+Leg_B
+  rotate: false
+  xy: 1053, 473
+  size: 30, 32
+  orig: 30, 32
+  offset: 0, 0
+  index: -1
+Leg_F
+  rotate: true
+  xy: 1016, 473
+  size: 32, 35
+  orig: 32, 35
+  offset: 0, 0
+  index: -1
+RedFx
+  rotate: false
+  xy: 933, 194
+  size: 103, 142
+  orig: 106, 142
+  offset: 3, 0
+  index: -1
+Shadow
+  rotate: false
+  xy: 882, 338
+  size: 92, 14
+  orig: 92, 14
+  offset: 0, 0
+  index: -1
+Splash
+  rotate: true
+  xy: 654, 324
+  size: 330, 195
+  orig: 330, 195
+  offset: 0, 0
+  index: -1
+finger
+  rotate: false
+  xy: 851, 332
+  size: 29, 20
+  orig: 30, 20
+  offset: 0, 0
+  index: -1
