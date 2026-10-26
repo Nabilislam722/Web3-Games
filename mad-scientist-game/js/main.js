@@ -7,6 +7,7 @@ import { Input } from './input.js';
 import { Sfx } from './audio.js';
 import { VIEW_H } from './data.js';
 import { loadProfile } from './util.js';
+import { Hemi } from './hemi.js';
 
 const canvas = document.getElementById('game');
 
@@ -28,7 +29,8 @@ async function boot() {
   const profile = loadProfile();
   const sfx = new Sfx(profile.muted);
   const input = new Input(canvas);
-  const ui = new UI({ profile, sfx, input });
+  const hemi = new Hemi();
+  const ui = new UI({ profile, sfx, input, hemi });
   const unlockAudio = () => { sfx.unlock(); sfx.startMusic(); };
   addEventListener('pointerdown', unlockAudio);
   addEventListener('keydown', unlockAudio);
@@ -74,6 +76,7 @@ async function boot() {
   game.resize(vw, vh);
   ui.attach(game);
   window.__game = game; // handy for debugging from the console
+  window.__hemi = hemi;
 
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) { ui.autoPause(); sfx.ctx?.suspend(); } else sfx.ctx?.resume();

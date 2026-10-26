@@ -9,6 +9,11 @@ skeletal animations through a small runtime written for this game. Poses are
 interpolated every frame and blended into each other, so the animation stays
 smooth at any refresh rate. There are no dependencies and no build step.
 
+**Bitcoin Block Raids** add a daily challenge on the [Hemi](https://hemi.xyz)
+network. Each raid's enemy lineup is seeded by a real Bitcoin block hash that
+the game reads through Hemi's hVM, and its leaderboard lives in a Hemi smart
+contract.
+
 ## Run it
 
 The game uses ES modules and `fetch`, so it must be served over HTTP (opening
@@ -72,6 +77,37 @@ test-fires the selected gun live in the background.
 Progress (potions, unlocks, equipped gun, best score, mute) is saved in
 `localStorage`.
 
+## Bitcoin Block Raids on Hemi
+
+Hemi is a Bitcoin and Ethereum L2. Its hVM is an EVM with a Bitcoin node built
+in, so contracts and RPC calls can read Bitcoin blocks directly through
+Hemi's Bitcoin Kit (hBK). Block Raids use that:
+
+- **A new raid every 144 Bitcoin blocks** (about a day). The game reads the
+  latest Bitcoin block from hBK and finds the block that opened the current raid.
+- **Bitcoin picks the raid.** That block's hash seeds the raid's guard lineup
+  (types, order, elites, spawn sides), its starting zone and a daily modifier
+  such as *Drone Swarm* or *Elite Escort*. Every player gets the same raid, and
+  nobody can know it in advance because Bitcoin miners decide it.
+- **The leaderboard is on Hemi.** After a raid run, *Submit to Hemi* records
+  the score with your wallet in the `MadScientistArena` contract. It keeps each
+  player's best run and a top 10 per raid, stamped with the Bitcoin height and
+  the gun used.
+
+Reading the raid needs no wallet. Submitting needs a browser wallet (MetaMask,
+Rabby or any EIP-1193/EIP-6963 wallet) with a little ETH on Hemi for gas. The
+game adds and switches to the Hemi network for you. Free play doesn't touch
+the network apart from the title-screen raid teaser.
+
+**Setup:** the leaderboard contract has to be deployed once. See
+[`contracts/README.md`](contracts/README.md), then paste its address into
+`js/hemi-config.js`. Until then, raids still run on the live Bitcoin seed and
+scores can't be submitted. The game uses Hemi mainnet by default; append
+`?hemi=testnet` or `?hemi=local` to the URL to switch networks.
+
+Scores come from the game client and are not verified on-chain, so the board
+is for fun and bragging rights, not prizes.
+
 ## How the animation stays smooth
 
 - **Skeletal playback.** `js/spine.js` reads the pack's `skeleton.json` and
@@ -103,6 +139,7 @@ mad-scientist-game/
 ├── index.html      screens, HUD and modals markup
 ├── style.css       UI styling and transitions
 ├── viewer.html     dev tool: browse and play every skeleton and animation
+├── contracts/      Hemi leaderboard contract, tests, deploy and local-chain scripts
 └── js/
     ├── main.js     boot, asset loading, resize, frame loop
     ├── game.js     camera, parallax, wave director, combat, pickups, rendering
@@ -111,11 +148,13 @@ mad-scientist-game/
     ├── spine.js    Spine 3.8 runtime (atlas, skeleton, animation state)
     ├── gl.js       WebGL sprite batcher
     ├── data.js     weapon, enemy, wave and zone tuning
-    ├── ui.js       DOM screens, armory, HUD, touch controls
+    ├── ui.js       DOM screens, armory, Block Raid screen, HUD, touch controls
+    ├── hemi.js     Hemi client: hBK reads, leaderboard, wallet, score submission
+    ├── hemi-config.js  networks and contract addresses
     ├── audio.js    synthesised SFX and music
     ├── input.js    keyboard, mouse and virtual controls
     ├── assets.js   asset manifest (paths into "Mad scientist/")
-    └── util.js     math, springs, collision, profile storage
+    └── util.js     math, springs, seeded RNG, collision, profile storage
 ```
 
 To tune difficulty, weapons or enemies, edit `js/data.js`. To inspect an
