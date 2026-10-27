@@ -1,0 +1,14 @@
+{
+  "name": "mad-scientist-lab-rampage",
+  "private": true,
+  "type": "module",
+  "description": "Static browser game. Serve this folder over HTTP to play locally. npm run deploy copies the game into dist/ and publishes it to Cloudflare Workers. Contracts and their tooling live in contracts/.",
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs && wrangler dev",
+    "deploy": "node build.mjs && wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "4.149.0"
+  }
+}

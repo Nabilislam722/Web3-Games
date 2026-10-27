@@ -1,0 +1,139 @@
+
+skeleton.png
+size: 1067,662
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+BlueFx
+  rotate: true
+  xy: 654, 360
+  size: 103, 142
+  orig: 106, 142
+  offset: 3, 0
+  index: -1
+Body
+  rotate: true
+  xy: 785, 195
+  size: 163, 195
+  orig: 163, 195
+  offset: 0, 0
+  index: -1
+Box
+  rotate: false
+  xy: 2, 10
+  size: 650, 650
+  orig: 650, 650
+  offset: 0, 0
+  index: -1
+Gun
+  rotate: true
+  xy: 986, 485
+  size: 175, 79
+  orig: 176, 79
+  offset: 0, 0
+  index: -1
+Hand_B
+  rotate: true
+  xy: 769, 21
+  size: 55, 93
+  orig: 55, 93
+  offset: 0, 0
+  index: -1
+Hand_B2
+  rotate: true
+  xy: 654, 2
+  size: 74, 113
+  orig: 74, 114
+  offset: 0, 1
+  index: -1
+Hand_F
+  rotate: true
+  xy: 986, 336
+  size: 147, 57
+  orig: 147, 58
+  offset: 0, 1
+  index: -1
+Hand_W_Gun
+  rotate: true
+  xy: 654, 78
+  size: 256, 129
+  orig: 257, 129
+  offset: 0, 0
+  index: -1
+Head01
+  rotate: false
+  xy: 864, 3
+  size: 98, 90
+  orig: 98, 90
+  offset: 0, 0
+  index: -1
+Head02
+  rotate: true
+  xy: 982, 230
+  size: 104, 80
+  orig: 104, 80
+  offset: 0, 0
+  index: -1
+Head03
+  rotate: true
+  xy: 881, 95
+  size: 98, 90
+  orig: 98, 90
+  offset: 0, 0
+  index: -1
+Head04
+  rotate: false
+  xy: 964, 3
+  size: 98, 90
+  orig: 98, 90
+  offset: 0, 0
+  index: -1
+Head05
+  rotate: true
+  xy: 785, 95
+  size: 98, 94
+  orig: 98, 94
+  offset: 0, 0
+  index: -1
+Leg_B
+  rotate: true
+  xy: 942, 399
+  size: 30, 32
+  orig: 30, 32
+  offset: 0, 0
+  index: -1
+Leg_F
+  rotate: true
+  xy: 942, 431
+  size: 32, 35
+  orig: 32, 35
+  offset: 0, 0
+  index: -1
+RedFx
+  rotate: true
+  xy: 798, 360
+  size: 103, 142
+  orig: 106, 142
+  offset: 3, 0
+  index: -1
+Shadow
+  rotate: true
+  xy: 1045, 391
+  size: 92, 14
+  orig: 92, 14
+  offset: 0, 0
+  index: -1
+Splash
+  rotate: false
+  xy: 654, 465
+  size: 330, 195
+  orig: 330, 195
+  offset: 0, 0
+  index: -1
+finger
+  rotate: true
+  xy: 1045, 360
+  size: 29, 20
+  orig: 30, 20
+  offset: 0, 0
+  index: -1

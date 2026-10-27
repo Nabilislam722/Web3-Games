@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // The game is a static site, so this Worker only serves files. dist/ is
+  // filled by build.mjs (npm run build), which copies just the game files.
+  "name": "blockchainrampage",
+  "compatibility_date": "2026-10-08",
+  "assets": {
+    "directory": "./dist"
+  }
+}

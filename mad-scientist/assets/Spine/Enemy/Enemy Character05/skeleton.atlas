@@ -1,0 +1,90 @@
+
+skeleton.png
+size: 919,654
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+Body
+  rotate: false
+  xy: 800, 4
+  size: 96, 98
+  orig: 96, 98
+  offset: 0, 0
+  index: -1
+Box
+  rotate: false
+  xy: 2, 2
+  size: 650, 650
+  orig: 650, 650
+  offset: 0, 0
+  index: -1
+Electric-Shoot
+  rotate: false
+  xy: 654, 440
+  size: 227, 212
+  orig: 227, 212
+  offset: 0, 0
+  index: -1
+Electric-Shoot-02
+  rotate: false
+  xy: 654, 226
+  size: 227, 212
+  orig: 227, 212
+  offset: 0, 0
+  index: -1
+Hand-B
+  rotate: false
+  xy: 738, 5
+  size: 49, 54
+  orig: 49, 54
+  offset: 0, 0
+  index: -1
+Hand-B2
+  rotate: false
+  xy: 883, 545
+  size: 17, 107
+  orig: 17, 108
+  offset: 0, 1
+  index: -1
+Hand-F
+  rotate: true
+  xy: 800, 104
+  size: 120, 106
+  orig: 120, 106
+  offset: 0, 0
+  index: -1
+Head
+  rotate: false
+  xy: 654, 7
+  size: 82, 52
+  orig: 82, 52
+  offset: 0, 0
+  index: -1
+Ice
+  rotate: true
+  xy: 654, 61
+  size: 163, 144
+  orig: 163, 144
+  offset: 0, 0
+  index: -1
+Leg-B
+  rotate: true
+  xy: 883, 477
+  size: 29, 34
+  orig: 29, 35
+  offset: 0, 1
+  index: -1
+Leg-F
+  rotate: true
+  xy: 883, 508
+  size: 30, 34
+  orig: 30, 34
+  offset: 0, 0
+  index: -1
+Shadow
+  rotate: true
+  xy: 902, 540
+  size: 112, 11
+  orig: 115, 11
+  offset: 1, 0
+  index: -1

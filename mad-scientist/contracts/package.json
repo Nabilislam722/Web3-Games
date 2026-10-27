@@ -1,0 +1,22 @@
+{
+  "name": "mad-scientist-hemi-contracts",
+  "private": true,
+  "type": "module",
+  "description": "Bitcoin Block Raid leaderboard for Mad Scientist: Lab Rampage on Hemi",
+  "scripts": {
+    "build": "hardhat build",
+    "test": "hardhat test nodejs",
+    "deploy:testnet": "hardhat run scripts/deploy.mjs --network testnet",
+    "deploy:mainnet": "hardhat run scripts/deploy.mjs --network mainnet",
+    "local": "hardhat run scripts/local.mjs",
+    "verify:testnet": "hardhat run scripts/verify.mjs --network testnet",
+    "verify:mainnet": "hardhat run scripts/verify.mjs --network mainnet"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "4.2.0",
+    "@nomicfoundation/hardhat-node-test-runner": "3.1.0",
+    "@nomicfoundation/hardhat-verify": "3.1.2",
+    "ethers": "6.17.0",
+    "hardhat": "3.19.0"
+  }
+}
